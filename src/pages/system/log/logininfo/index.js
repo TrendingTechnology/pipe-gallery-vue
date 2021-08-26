@@ -1,2 +1,2 @@
-import LoginInfo from './Test'
+import LoginInfo from './LoginInfo'
 export default LoginInfo

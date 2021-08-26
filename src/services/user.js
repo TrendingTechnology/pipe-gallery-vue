@@ -21,7 +21,10 @@ export async function getUserInfo() {
 export async function getRoutesConfig() {
   return request(ROUTES, METHOD.GET)
 }
-export async function getLogInfo(beginDate, endDate) {
+export async function getLogInfo() {
+  return request(LOG_INFO,METHOD.POST)
+}
+export async function getLogInfoByDate(beginDate, endDate) {
   return request(LOG_INFO,METHOD.POST, {
     beginDate: beginDate,
     endDate: endDate
@@ -42,5 +45,6 @@ export default {
   logout,
   getRoutesConfig,
   getUserInfo,
-  getLogInfo
+  getLogInfo,
+  getLogInfoByDate
 }
