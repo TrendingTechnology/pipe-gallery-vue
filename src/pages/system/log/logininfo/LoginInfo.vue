@@ -1,5 +1,5 @@
 <template>
-  <a-table :data-source="data" :columns="columns" >
+  <a-table :data-source="data" :columns="columns" @change="onChange">
     <div
         slot="filterDropdown"
         slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
@@ -57,6 +57,7 @@
 
 <script>
 const data = [];
+
 import {getLogInfo} from '@/services/user'
 export default {
   name: "Login",
@@ -71,6 +72,7 @@ export default {
     }
   },
   methods: {
+    onChange,
     handleSearch(selectedKeys, confirm, dataIndex) {
       confirm();
       this.searchText = selectedKeys[0];
@@ -104,6 +106,7 @@ export default {
           dataIndex: 'infoId',
           key: 'infoId',
           sorter: (a, b) => a.age - b.age,
+          sortDirections: 'descend'
         },
         {
           title: '用户账号',
@@ -176,11 +179,16 @@ export default {
           dataIndex: 'loginLocation',
           key: 'loginLocation',
           filters: [
-            { text: '内网', value: '内网' },
-            { text: '外网', value: '外网' },
+            { text: '内网', value: 'in' },
+            { text: '外网', value: 'out' },
           ],
           filteredValue: filteredInfo.loginLocation || null,
-          onFilter: (value, record) => record.loginLocation.indexOf(value) === 0,
+          // onFilter: (value, record) => record.loginLocation.indexOf(value) === 0,
+          onFilter: (value, record) =>
+              record.loginLocation
+                  .toString()
+                  .toLowerCase()
+                  .includes(value.toLowerCase()),
           ellipsis: true,
         },
         {
@@ -217,28 +225,6 @@ export default {
           align:"center",
           onFilter: (value, record) =>
               record.os
-                  .toString()
-                  .toLowerCase()
-                  .includes(value.toLowerCase()),
-          onFilterDropdownVisibleChange: visible => {
-            if (visible) {
-              setTimeout(() => {
-                this.searchInput.focus();
-              });
-            }
-          },
-        },
-        {
-          title: '登录状态',
-          dataIndex: 'status',
-          key: 'status',
-          scopedSlots: {
-            filterDropdown: 'filterDropdown',
-            filterIcon: 'filterIcon',
-            customRender: 'customRender',
-          },
-          onFilter: (value, record) =>
-              record.status
                   .toString()
                   .toLowerCase()
                   .includes(value.toLowerCase()),

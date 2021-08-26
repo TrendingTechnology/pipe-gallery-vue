@@ -3,6 +3,7 @@ import App from './App.vue'
 import {initRouter} from './router'
 import './theme/index.less'
 import Antd from 'ant-design-vue'
+import 'ant-design-vue/dist/antd.css';
 import Viser from 'viser-vue'
 import '@/mock'
 import store from './store'
