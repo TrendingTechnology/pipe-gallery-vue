@@ -1,5 +1,5 @@
-import {LOGIN,USER_INFO, ROUTES,LOG_INFO} from '@/services/api'
-import {request, METHOD, removeAuthorization} from '@/utils/request'
+import {SYS_INFO,BROKER_INFO} from '@/services/api'
+import {request, METHOD} from '@/utils/request'
 
 /**
  * 登录服务
@@ -14,14 +14,18 @@ export async function login(userAccount, userPassword) {
     })
 }
 
-export async function getUserInfo() {
-    return request(USER_INFO,METHOD.GET)
+export async function getSysInfo() {
+    return request(SYS_INFO,METHOD.GET)
+}
+export async function getBrokerInfo() {
+    return request(BROKER_INFO,METHOD.GET)
 }
 
 
 
 export default {
     login,
-    getUserInfo,
+    getSysInfo,
+    getBrokerInfo
 
 }

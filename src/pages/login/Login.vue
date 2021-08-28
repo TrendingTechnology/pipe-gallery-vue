@@ -57,7 +57,7 @@ export default {
     return {
       logging: false,
       error: '',
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
     }
   },
   computed: {

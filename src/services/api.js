@@ -2,7 +2,7 @@
 //const API_PROXY_PREFIX='/api'
 //const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_BASE_URL : API_PROXY_PREFIX
 //const BASE_URL = process.env.VUE_APP_API_BASE_URL
-const request_url = 'http://192.168.2.121:9999'
+const request_url = 'http://192.168.2.219:9998'
 module.exports = {
   LOGIN: `${request_url}/auth/login`,
   USER_INFO: `${request_url}/auth/user/info`,
@@ -30,4 +30,6 @@ module.exports = {
   USER_PASS:`${request_url}/userMgr/setUserPass`,
   GET_USER_ROLE:`${request_url}/role/getUserRole`,
   LOG_INFO:`${request_url}/info/logInfo`,
+  SYS_INFO:`${request_url}/info/sysInfo`,
+  BROKER_INFO:`${request_url}/info/emqx/broker`
 }
