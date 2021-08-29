@@ -2,6 +2,7 @@
   <span>
     <sys-info :sys-info="data.sysInfo" :broker-info="data.emqBrokerInfo"></sys-info>
     <client-info :emq-clients-info="data.emqClientsInfo" ></client-info>
+<!--    <echarts-test></echarts-test>-->
   </span>
 
 
@@ -9,12 +10,13 @@
 <script>
 import ClientInfo from '@/pages/dashboard/analysis/ClientInfo'
 import SysInfo from "@/pages/dashboard/analysis/SysInfo";
+import EchartsTest from "@/pages/dashboard/analysis/EchartsTest";
 
 import {getSysInfo} from "@/services/analysis";
 
 
 export default {
-  components:{SysInfo,ClientInfo},
+  components:{SysInfo,ClientInfo,EchartsTest},
   data () {
     return{
       data:{}

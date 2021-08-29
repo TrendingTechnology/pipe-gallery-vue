@@ -2,26 +2,17 @@
   <div>
     <a-row style="margin-top: 0" :gutter="[24, 24]">
       <a-col :sm="24" :md="12" :xl="6">
-        <chart-card :loading="loading" title="在线设备" :total="1">
-          <a-tooltip :title="$t('introduce')" slot="action">
-            <a-icon type="info-circle-o" />
-          </a-tooltip>
-          <div>
-            <trend style="margin-right: 16px" :term="$t('wow')" :percent="12" :is-increase="true" :scale="0" />
-            <trend :term="$t('dod')" :target="100" :value="89" :scale="0" />
-          </div>
-          <div slot="footer">在线设备数量可以超过已添加设备数量</div>
-        </chart-card>
+       <echarts-test></echarts-test>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6">
-        <chart-card :loading="loading" title="已添加设备" :total="emqClientsInfo.length">
+        <chart-card :loading="loading" :title="$t('visits')" total="￥ 189,345">
           <a-tooltip :title="$t('introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
             <mini-area />
           </div>
-
+          <div slot="footer">{{$ta('daily|visits', 'p')}}<span> 123,4</span></div>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6">
@@ -141,7 +132,7 @@ import RankingList from '../../../components/chart/RankingList'
 import HotSearch from './HotSearch'
 import SalesData from './SalesData'
 import Trend from '../../../components/chart/Trend'
-
+import EchartsTest from "@/pages/dashboard/analysis/EchartsTest";
 const rankList = []
 const columns = [
   {
@@ -294,7 +285,7 @@ export default {
   mounted() {
     this.emqClientsInfo[0].connected = false;
   },
-  components: {Trend, SalesData, HotSearch, RankingList, Bar, MiniProgress, MiniBar, MiniArea, ChartCard}
+  components: {Trend, SalesData, HotSearch, RankingList, Bar, MiniProgress, MiniBar, MiniArea, ChartCard,EchartsTest}
 }
 </script>
 
