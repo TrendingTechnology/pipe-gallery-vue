@@ -1,5 +1,7 @@
 <template>
-  <a-table :data-source="data" :columns="columns,pagination">
+  <div style="margin-top: 15px;background-color: white;width:100%;">
+    <div style="height:7px"></div>
+  <a-table :data-source="data" :columns="columns , pagination" style="width:98%;margin: auto;background-color:white">
     <div
         slot="filterDropdown"
         slot-scope="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
@@ -79,6 +81,7 @@
       </template>
     </template>
   </a-table>
+    </div>
 </template>
 <script>
 import {getLogInfo, getLogInfoByDate} from "@/services/user";
@@ -270,8 +273,10 @@ export default {
       data:[],
       columns,
       pagination: {
-        pageSize: 9,
-        showQuickJumper: true
+        pageSize: 8,
+        showQuickJumper: true,
+        hideOnSinglePage: true,
+        size: 'small'
       },
       searchText: '',
       searchInput: null,

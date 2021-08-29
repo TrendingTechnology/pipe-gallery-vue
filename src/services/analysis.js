@@ -1,4 +1,4 @@
-import {SYS_INFO,BROKER_INFO} from '@/services/api'
+import {SYS_INFO} from '@/services/api'
 import {request, METHOD} from '@/utils/request'
 
 /**
@@ -17,15 +17,12 @@ export async function login(userAccount, userPassword) {
 export async function getSysInfo() {
     return request(SYS_INFO,METHOD.GET)
 }
-export async function getBrokerInfo() {
-    return request(BROKER_INFO,METHOD.GET)
-}
+
 
 
 
 export default {
     login,
     getSysInfo,
-    getBrokerInfo
 
 }

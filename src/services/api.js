@@ -31,5 +31,4 @@ module.exports = {
   GET_USER_ROLE:`${request_url}/role/getUserRole`,
   LOG_INFO:`${request_url}/info/logInfo`,
   SYS_INFO:`${request_url}/info/sysInfo`,
-  BROKER_INFO:`${request_url}/info/emqx/broker`
 }

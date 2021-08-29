@@ -1,32 +1,31 @@
 <template>
-
-    <a-row style="margin-top: 0" :gutter="[24, 24]">
-      <a-col :sm="24" :md="12" :xl="6" style="width:100%">
-        <a-card title="状态" :bordered="true" style="width: 100%">
-          <a-space :size="50">
+  <a-row style="margin-top: 0" :gutter="[24, 24]">
+    <a-col :sm="24" :md="12" :xl="6" style="width:100%">
+      <a-card title="状态" :bordered="true" style="width: 100%">
+        <a-space :size="50">
             <span>
               <div style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-bottom: 7px">负载状态</div>
               <a-tooltip autoAdjustOverflow>
                 <template slot="title">
                   <span style="font-size:10px">
-                    <span v-if="data.load.one">最近1分钟平均负载:  {{ data.load.one }}</span><br/>
-                  <span>最近5分钟平均负载:   {{ data.load.five }}</span>  <br/>
-                  <span>最近15分钟平均负载:   {{ data.load.fifteen }}</span><br/>
-                  <span>user: {{ data.cpu_times.user }}</span><br/>
-                  <span>system: {{ data.cpu_times.system }}</span><br/>
-                  <span>idle: {{ data.cpu_times.idle }}</span><br/>
-                  <span>iowait: {{ data.cpu_times.iowait }}</span><br/>
-                  <span>irq: {{ data.cpu_times.irq }}</span><br/>
-                  <span>softirq: {{ data.cpu_times.softirq }}</span><br/>
-                  <span>steal: {{ data.cpu_times.steal }}</span><br/>
-                  <span>guest: {{ data.cpu_times.guest }}</span><br/>
-                  <span>总进程数: {{ data.cpu_times.总进程数 }}</span><br/>
-                  <span>活动进程数: {{ data.cpu_times.活动进程数 }}</span>
+                    <span v-if="sysInfo.load.one">最近1分钟平均负载:  {{ sysInfo.load.one }}</span><br/>
+                  <span>最近5分钟平均负载:   {{ sysInfo.load.five }}</span>  <br/>
+                  <span>最近15分钟平均负载:   {{ sysInfo.load.fifteen }}</span><br/>
+                  <span>user: {{ sysInfo.cpu_times.user }}</span><br/>
+                  <span>system: {{ sysInfo.cpu_times.system }}</span><br/>
+                  <span>idle: {{ sysInfo.cpu_times.idle }}</span><br/>
+                  <span>iowait: {{ sysInfo.cpu_times.iowait }}</span><br/>
+                  <span>irq: {{ sysInfo.cpu_times.irq }}</span><br/>
+                  <span>softirq: {{ sysInfo.cpu_times.softirq }}</span><br/>
+                  <span>steal: {{ sysInfo.cpu_times.steal }}</span><br/>
+                  <span>guest: {{ sysInfo.cpu_times.guest }}</span><br/>
+                  <span>总进程数: {{ sysInfo.cpu_times.总进程数 }}</span><br/>
+                  <span>活动进程数: {{ sysInfo.cpu_times.活动进程数 }}</span>
                   </span>
 
                 </template>
 
-              <a-progress type="circle" :percent="(per=data.load.one*100).toFixed(0)"
+              <a-progress type="circle" :percent="per=Number((sysInfo.load.one*100/(sysInfo.cpu[4]+sysInfo.cpu[1])).toFixed(1))"
                           :strokeColor="per<90?'rgb(32, 165, 58)':'rgb(221, 47, 0)'" :width="115"
                           :strokeWidth="7">
               <template #format="percent">
@@ -39,7 +38,7 @@
               </a-tooltip>
             <div
                 style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-top: 7px">{{
-                data.load.one > 0.9 ? '运行堵塞' : '运行流畅'
+                sysInfo.load.one > 0.9 ? '运行堵塞' : '运行流畅'
               }}</div>
             </span>
 
@@ -49,9 +48,9 @@
               <a-tooltip autoAdjustOverflow>
                 <template slot="title">
                   <span style="font-size:10px">
-                  <span>{{ data.cpu[3] }}</span><br/>
-                    <span>{{ data.cpu[5] }}个物理CPU，{{ data.cpu[4] }}个物理核心，{{ data.cpu[1] }}个逻辑核心</span><br/>
-                    <span v-for=" (cpu ,i) in data.cpu[2]">
+                  <span>{{ sysInfo.cpu[3] }}</span><br/>
+                    <span>{{ sysInfo.cpu[5] }}个物理CPU，{{ sysInfo.cpu[4] }}个物理核心，{{ sysInfo.cpu[1] }}个逻辑核心</span><br/>
+                    <span v-for=" (cpu ,i) in sysInfo.cpu[2]">
                       <span>CPU-{{ i + 1 }}:    {{ cpu }}% &nbsp;</span>
                       <span v-if="i%2===1"><br/></span>
                       <span v-if="i%2===0"> &nbsp;| &nbsp;</span>
@@ -60,7 +59,7 @@
                   </span>
 
                 </template>
-            <a-progress type="circle" :percent="per=data.cpu[0]"
+            <a-progress type="circle" :percent="Number(per=sysInfo.cpu[0])"
                         :strokeColor="per<90?'rgb(32, 165, 58)':'rgb(221, 47, 0)'" :width="115"
                         :strokeWidth="7">
               <template #format="percent">
@@ -71,13 +70,16 @@
               </template>
             </a-progress>
               </a-tooltip>
-              <div style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-top: 7px">{{ data.cpu[4] }} 核心</div>
+              <div style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-top: 7px">{{
+                  sysInfo.cpu[4]
+                }} 核心</div>
               </span>
 
 
             <span>
               <div style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-bottom: 7px">内存使用率</div>
-            <a-progress type="circle" :percent="per=((data.mem.memRealUsed/data.mem.memTotal)*100).toFixed(1)"
+            <a-progress type="circle"
+                        :percent="per=Number(((sysInfo.mem.memRealUsed/sysInfo.mem.memTotal)*100).toFixed(1))"
                         :strokeColor="per<90?'rgb(32, 165, 58)':'rgb(221, 47, 0)'" :width="115" :strokeWidth="7">
             <template #format="percent">
               <span
@@ -88,10 +90,10 @@
           </a-progress>
               <div
                   style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-top: 7px">{{
-                  data.mem.memRealUsed
-                }}/{{ data.mem.memTotal }}(MB)</div>
+                  sysInfo.mem.memRealUsed
+                }}/{{ sysInfo.mem.memTotal }}(MB)</div>
             </span>
-            <span v-for="hardDiskInfo in data.disk">
+            <span v-for="hardDiskInfo in sysInfo.disk">
               <div
                   style="color:rgb(153, 153, 153);text-align:center;font-size: 16px;margin-bottom: 7px">{{
                   hardDiskInfo.path
@@ -116,7 +118,7 @@
                   </span>
 
                 </template>
-              <a-progress type="circle" :percent="per=hardDiskInfo.size[3].replace('%','')"
+              <a-progress type="circle" :percent="per=parseInt(hardDiskInfo.size[3].replace('%',''))"
                           :strokeColor="per<90?'rgb(32, 165, 58)':'rgb(221, 47, 0)'"
                           :width="115" :strokeWidth="7">
               <template #format="percent">
@@ -132,41 +134,18 @@
                   hardDiskInfo.size[1]
                 }} / {{ hardDiskInfo.size[0] }}</div>
             </span>
-            <span>
-                  <a-descriptions title="EMQX服务端" layout="vertical" :column="2">
-              <a-descriptions-item label="名称">
-               {{ brokerData[0].sysdescr }}
-              </a-descriptions-item>
-              <a-descriptions-item label="运行时间">
-                {{ brokerData[0].uptime.replace(/minutes.*/, 'minutes') }}
-              </a-descriptions-item>
-              <a-descriptions-item label="节点名称">
-                {{ brokerData[0].node }}
-              </a-descriptions-item>
-              <a-descriptions-item label="状态">
-                <span :value="isRunning=(brokerData[0].node_status==='Running')">
-                  <a-badge status="processing" :text="brokerData[0].node_status"
-                           :color="isRunning?'green':'rgb(255,0,0)'"/>
-                </span>
+        <broker-info :emq-broker-info="brokerInfo"></broker-info>
+        </a-space>
+      </a-card>
+    </a-col>
 
-              </a-descriptions-item>
-
-            </a-descriptions>
-            </span>
-
-          </a-space>
-        </a-card>
-      </a-col>
-
-    </a-row>
-
-
+  </a-row>
 </template>
 
-<script>
-import {getBrokerInfo, getSysInfo} from '@/services/analysis'
 
-const data = {
+<script>
+
+const defaultSysInfo = {
   cpu: [
     100,
     0,
@@ -226,68 +205,30 @@ const data = {
     memCached: 0
   }
 };
-const brokerData = [
+const defaultEmqBrokerInfo = [
   {
     node_status: "Error",
     uptime: "null",
     node: "数据加载出错,请检查网络",
-    sysdescr: "数据加载出错,请检查网络"
+    sysdescr: "数据加载出错"
   }
-];
-
-
+]
+import BrokerInfo from "@/pages/dashboard/analysis/BrokerInfo"
 export default {
   name: "SysInfo",
-  data() {
-    return {
-      data,
-      brokerData
-    };
-  },
-  methods: {
-
-    loadSysInfo() {
-      const vm = this;
-      getSysInfo().then(res => {
-        if (res.data.code === 200) {
-          vm.data = res.data.data;
-        } else {
-          this.$message.error('获取系统信息失败！', 3)
-        }
-      })
-
+  components:{BrokerInfo},
+  props: {
+    sysInfo: {
+      type: Object,
+      default:()=> defaultSysInfo,
     },
-    loadBrokerInfo() {
-      const vm = this;
-      getBrokerInfo().then(res => {
-        if (res.data.code === 200) {
-          vm.brokerData = res.data.data;
-        } else {
-          this.$message.error('获取EMQ服务端信息失败！', 3)
-        }
-      })
-    }
-
-  },
-  created() {
-    this.loadSysInfo()
-    this.loadBrokerInfo()
-
-  },
-
-  mounted() {
-    if (this.timer) {
-      clearInterval(this.timer);
-    } else {
-      this.timer = setInterval(() => {
-        this.loadSysInfo(); // methods中请求数据的方法
-        this.loadBrokerInfo()
-      }, 3000);
+    brokerInfo:{
+      type: Array,
+      default:()=> defaultEmqBrokerInfo,
     }
   },
-  destroyed() {
-    clearInterval(this.timer);
-  }
+
+
 
 }
 </script>
