@@ -20,9 +20,11 @@ const routerMap = {
   },
   dashBoard: {
     name: 'dashBoard',
-    icon: 'dashboard',
-    component: () => import('@/pages/dashboard/analysis')
+    component: () => import('@/pages/dashboard/analysis'),
+
   },
+
+
   个人中心:{
     name: '个人中心',
     component: () => import('@/pages/system/personal')
@@ -64,9 +66,9 @@ const routerMap = {
     name: '设备状态',
     component: () => import('@/pages/device/status')
   },
-  设备详情: {
-    name: '设备详情',
-    component: () => import('@/pages/device/detail')
+  设备列表: {
+    name: '设备列表',
+    component: () => import('@/pages/device/list')
   },
   success: {
     name: '成功',

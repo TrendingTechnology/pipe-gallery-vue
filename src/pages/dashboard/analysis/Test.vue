@@ -1,7 +1,7 @@
 <template xmlns="">
   <span>
     <sys-info :sys-info="data.sysInfo" :broker-info="data.emqBrokerInfo"></sys-info>
-    <client-info :emq-clients-info="data.emqClientsInfo" ></client-info>
+    <client-info :data-info="data" ></client-info>
 <!--    <echarts-test></echarts-test>-->
   </span>
 
@@ -10,7 +10,7 @@
 <script>
 import ClientInfo from '@/pages/dashboard/analysis/ClientInfo'
 import SysInfo from "@/pages/dashboard/analysis/SysInfo";
-import EchartsTest from "@/pages/dashboard/analysis/EchartsTest";
+import EchartsTest from "@/pages/dashboard/analysis/DoubleLineMess";
 
 import {getSysInfo} from "@/services/analysis";
 
@@ -19,7 +19,8 @@ export default {
   components:{SysInfo,ClientInfo,EchartsTest},
   data () {
     return{
-      data:{}
+      data:{},
+      nowTime:null
     }
   },
   methods: {

@@ -45,7 +45,7 @@
                         </a-form-model-item>
                     </a-col>
                     <a-col :span="12">
-                        <a-form-model-item label="菜单图标" prop="resourceIcon">
+                        <a-form-model-item label="菜单图标" prop="resourceIcon" :label-col="rowLabelCol" :wrapper-col="rowWrapperCol">
                             <a-input v-model="form.resourceIcon"/>
                         </a-form-model-item>
                         <a-form-model-item label="菜单类型"  prop="resourceType">

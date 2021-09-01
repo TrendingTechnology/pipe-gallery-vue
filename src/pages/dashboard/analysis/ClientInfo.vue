@@ -1,48 +1,60 @@
 <template>
   <div>
     <a-row style="margin-top: 0" :gutter="[24, 24]">
-      <a-col :sm="24" :md="12" :xl="6">
-       <echarts-test></echarts-test>
-      </a-col>
-      <a-col :sm="24" :md="12" :xl="6">
-        <chart-card :loading="loading" :title="$t('visits')" total="￥ 189,345">
-          <a-tooltip :title="$t('introduce')" slot="action">
+
+      <a-col :sm="24" :md="12" :xl="6" >
+        <chart-card :loading="loading" title="添加客户端数" total="0" class="count">
+          <a-tooltip title="在系统中添加的设备数量" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
-          <div>
-            <mini-area />
-          </div>
-          <div slot="footer">{{$ta('daily|visits', 'p')}}<span> 123,4</span></div>
+          <div slot="footer"><span> 通过设备 -> 设备管理处添加设备</span></div>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6">
-        <chart-card :loading="loading" :title="$t('payments')" total="￥ 189,345">
-          <a-tooltip :title="$t('introduce')" slot="action">
+        <chart-card :loading="loading" title="在线客户端数" :total="dataInfo.emqClientsInfo.length-1" class="count">
+          <a-tooltip title="实际在线的设备数量" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-bar />
+
           </div>
-          <div slot="footer">{{$t('conversion')}} <span>60%</span></div>
+          <div slot="footer"> <span>连接EMQX的设备,可大于添加数	</span></div>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6">
-        <chart-card :loading="loading" :title="$t('operating')" total="73%">
-          <a-tooltip :title="$t('introduce')" slot="action">
+        <chart-card :loading="loading" title="消息确认率" :total="((msgSent/msgRev)*100).toFixed(1)+'%'">
+          <a-tooltip title="发送的消息是否被确认收到" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-progress target="90" percent="78" color="#13C2C2" height="8px"/>
+            <double-line-mess :rev-msg="msgRev" :sent-msg="msgSent" :timeToChange="dataInfo.emqBrokerInfo[0].uptime"></double-line-mess>
           </div>
-          <div slot="footer" style="white-space: nowrap;overflow: hidden">
-            <trend style="margin-right: 16px" :term="$t('wow')" :percent="12" :is-increase="true" :scale="0" />
-            <trend :term="$t('dod')" :target="100" :value="89" :scale="0" />
+          <div slot="footer">
+            <a-badge color="rgb(115, 182, 195)" :text="'发送: '+msgRev+' 条'" />
+            <pre>  </pre>
+            <a-badge color="rgb(255, 227, 135)" :text="'收到: '+msgSent+' 条'" />
+
+          </div>
+        </chart-card>
+      </a-col>
+      <a-col :sm="24" :md="12" :xl="6">
+        <chart-card :loading="loading" title="流量" >
+          <a-tooltip title="实时网速" slot="action">
+            <a-icon type="info-circle-o" />
+          </a-tooltip>
+          <div>
+           <double-line-net :y-axis1="dataInfo.sysInfo.up" :y-axis2="dataInfo.sysInfo.down" ></double-line-net>
+          </div>
+          <div slot="footer">
+            <a-badge color="rgb(115, 182, 195)" :text="'上行: '+dataInfo.sysInfo.down+' KB/s'" />
+            <pre> </pre>
+            <a-badge color="rgb(255, 227, 135)" :text="'下行: '+dataInfo.sysInfo.up+' KB/s'" />
           </div>
         </chart-card>
       </a-col>
     </a-row>
 
-      <a-table :columns="columns,pagination" :data-source="emqClientsInfo" size="middle"
+      <a-table :columns="columns,pagination" :data-source="dataInfo.emqClientsInfo" size="middle"
                style="margin-top: 24px;background-color: white"
                :rowKey="(record,index)=> index"
       >
@@ -105,34 +117,27 @@
                       color="red"/>
             </span>
             </span>
-            <span v-else>{{text}}</span>
+            <span v-else>
+              <span v-if="column.dataIndex==='clientid'">
+                <a @click="showDeviceOverview" :data-index="index">{{text}}</a>
+              </span>
+              <span v-else>
+                {{text}}
+              </span>
+
+            </span>
           </template>
-
         </template>
-
       </a-table>
-
-
-
-
-
-
+    <device-overview v-bind:visible="isVisible" v-if="messagesDevice,isVisible" :device-over="dataInfo.emqClientsInfo"
+    :device-index="Number(msessageIndex)"></device-overview>
 
 
   </div>
 </template>
 
 <script>
-import ChartCard from '../../../components/card/ChartCard'
-import MiniArea from '../../../components/chart/MiniArea'
-import MiniBar from '../../../components/chart/MiniBar'
-import MiniProgress from '../../../components/chart/MiniProgress'
-import Bar from '../../../components/chart/Bar'
-import RankingList from '../../../components/chart/RankingList'
-import HotSearch from './HotSearch'
-import SalesData from './SalesData'
-import Trend from '../../../components/chart/Trend'
-import EchartsTest from "@/pages/dashboard/analysis/EchartsTest";
+
 const rankList = []
 const columns = [
   {
@@ -232,25 +237,27 @@ const columns = [
     align:'center'
   },
 ];
-for (let i = 0; i < 8; i++) {
-  rankList.push({
-    name: '桃源村' + i + '号店',
-    total: 1234.56 - i * 100
-  })
-}
-
+import ChartCard from '../../../components/card/ChartCard'
+import DoubleLineMess from "@/pages/dashboard/analysis/DoubleLineMess";
+import DoubleLineNet from "@/pages/dashboard/analysis/DoubleLineNet";
+import DeviceOverview from "@/pages/dashboard/analysis/DeviceOverview";
 export default {
   name: 'ClientInfo',
+  components: { ChartCard,DoubleLineMess,DoubleLineNet,DeviceOverview},
   props:{
-    emqClientsInfo: {
-      type: Array,
-      default:()=>[]
+    dataInfo:{
+      type:Object,
+      default:()=>{}
     }
   },
   i18n: require('./i18n'),
   data () {
-
     return {
+      msessageIndex: null,
+      messagesDevice:null,
+      isVisible:false,
+      msgRev:null,
+      msgSent:null,
       columns ,
       searchText: '',
       searchInput: null,
@@ -278,14 +285,38 @@ export default {
       clearFilters();
       this.searchText = '';
     },
+    showDeviceOverview(e){
+      this.msessageIndex=e.target.dataset.index
+      // this.messagesDevice=this.dataInfo.emqClientsInfo[e.target.dataset.index]
+      this.isVisible=true
+    },
+    cancelshowDeviceOverview(){
+      this.isVisible=false
+    }
+  },
+  beforeCreate() {
+    this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received'],
+        this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
   },
   created() {
     setTimeout(() => this.loading = !this.loading, 1000)
+
+    // console.log(this.dataInfo);
+  },
+  watch: {
+    dataInfo: {
+      immediate:true,
+      handler:function(){
+      this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received'],
+      this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
+    }}
+
   },
   mounted() {
-    this.emqClientsInfo[0].connected = false;
+
+
   },
-  components: {Trend, SalesData, HotSearch, RankingList, Bar, MiniProgress, MiniBar, MiniArea, ChartCard,EchartsTest}
+
 }
 </script>
 
@@ -309,5 +340,18 @@ export default {
     display: none;
   }
 }
+pre {
+  display: inline;
+}
+.count /deep/ .total{
+  overflow: visible;
+  font-size: 70px;
+  height: 59px;
+  margin-top:30px;
+  margin-left: 150px;
+}
+.count /deep/ .chart-card-content{
+  height: 0;
 
+}
 </style>
