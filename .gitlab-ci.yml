@@ -1,0 +1,13 @@
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - echo first test vue
+    - npm install
+    - npm run build
+    - cp -r  dist/ docker/dist/
+    - docker-compose down
+    - docker-compose up -d --build
+    - docker rmi $(docker images -qf dangling=true)

@@ -1,0 +1,8 @@
+version: "3.1"
+services:
+  vuetest:
+    build: docker
+    restart: always
+    container_name: vuetest
+    ports:
+      - 9001:80
