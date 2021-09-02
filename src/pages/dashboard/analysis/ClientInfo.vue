@@ -138,7 +138,6 @@
 
 <script>
 
-const rankList = []
 const columns = [
   {
     title: '客户端id',
@@ -268,9 +267,6 @@ export default {
         hideOnSinglePage: true,
         size: 'small'
       },
-
-
-      rankList,
       loading: true
     }
   },
@@ -294,7 +290,7 @@ export default {
       this.isVisible=false
     }
   },
-  beforeCreate() {
+  mounted() {
     this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received'],
         this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
   },
@@ -310,10 +306,6 @@ export default {
       this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received'],
       this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
     }}
-
-  },
-  mounted() {
-
 
   },
 

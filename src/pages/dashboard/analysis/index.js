@@ -1,2 +1,2 @@
-import Analysis from './Test'
+import Analysis from './Analysis'
 export default Analysis

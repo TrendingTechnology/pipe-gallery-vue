@@ -13,7 +13,7 @@
         </a-button>
       </template>
 
-      <a-tabs default-active-key="1" @change="handleClick">
+      <a-tabs default-active-key="1" >
         <a-tab-pane key="1" tab="连接信息">
           <a-descriptions :column="2">
             <a-descriptions-item label="节点">
@@ -182,18 +182,6 @@ export default {
           vm.subTop =res.data.data
 
       })
-    },
-    handleClick(activeKey){
-      if(activeKey===4)
-      {
-        if (this.timer) {
-          clearInterval(this.timer);
-        } else {
-          this.timer = setInterval(() => {
-            this.loadSubTop() // methods中请求数据的方法
-          }, 3000);
-        }
-      }
     }
 
   },
@@ -212,6 +200,15 @@ export default {
           this.deviceOverview=initDeviceInfo
         }
       }
+    }
+  },
+  mounted() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    } else {
+      this.timer = setInterval(() => {
+        this.loadSubTop() // methods中请求数据的方法
+      }, 3000);
     }
   },
   destroyed() {
