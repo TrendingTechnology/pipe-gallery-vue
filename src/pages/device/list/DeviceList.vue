@@ -130,33 +130,33 @@
 import StandardTable from '@/components/table/StandardTable'
 const columns = [
   {
-    title: '规则编号',
+    title: '序号',
     dataIndex: 'no'
   },
   {
-    title: '描述',
+    title: '设备编号',
     dataIndex: 'description',
     scopedSlots: { customRender: 'description' }
   },
   {
-    title: '服务调用次数',
+    title: '温度',
     dataIndex: 'callNo',
     sorter: true,
     needTotal: true,
     customRender: (text) => text + ' 次'
   },
   {
-    dataIndex: 'status',
+    dataIndex: '湿度',
     needTotal: true,
     slots: {title: 'statusTitle'}
   },
   {
-    title: '更新时间',
+    title: '液位值',
     dataIndex: 'updatedAt',
     sorter: true
   },
   {
-    title: '操作',
+    title: '可燃气体浓度',
     scopedSlots: { customRender: 'action' }
   }
 ]

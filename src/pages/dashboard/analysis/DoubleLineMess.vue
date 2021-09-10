@@ -69,7 +69,7 @@ export default {
           show:false
         },
         series: [{
-          name: '确认率',
+          name: '确认比',
           smooth: true,
           symbol:'circle',
           lineStyle: {
@@ -131,7 +131,7 @@ export default {
           dropRates.shift()
         }
 
-        dropRates.push(Number(((this.sentMsg/this.revMsg)*100).toFixed(1)))
+        dropRates.push(Number(((this.sentMsg/this.revMsg)).toFixed(1)))
 
         axis.push(
             this.getTime()

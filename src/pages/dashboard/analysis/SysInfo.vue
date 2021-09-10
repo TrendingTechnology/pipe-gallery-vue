@@ -8,7 +8,7 @@
               <a-tooltip autoAdjustOverflow>
                 <template slot="title">
                   <span style="font-size:10px">
-                    <span v-if="sysInfo.load.one">最近1分钟平均负载:  {{ sysInfo.load.one }}</span><br/>
+                    <span>最近1分钟平均负载:  {{ sysInfo.load.one }}</span><br/>
                   <span>最近5分钟平均负载:   {{ sysInfo.load.five }}</span>  <br/>
                   <span>最近15分钟平均负载:   {{ sysInfo.load.fifteen }}</span><br/>
                   <span>user: {{ sysInfo.cpu_times.user }}</span><br/>

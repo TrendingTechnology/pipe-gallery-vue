@@ -22,17 +22,17 @@
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6">
-        <chart-card :loading="loading" title="消息确认率" :total="((msgSent/msgRev)*100).toFixed(1)+'%'">
-          <a-tooltip title="发送的消息是否被确认收到" slot="action">
+        <chart-card :loading="loading" title="消息确认比" :total="(((msgSent/msgRev)).toFixed(1))">
+          <a-tooltip title="确认比可大概估计订阅话题的客户端数" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
             <double-line-mess :rev-msg="msgRev" :sent-msg="msgSent" :timeToChange="dataInfo.emqBrokerInfo[0].uptime"></double-line-mess>
           </div>
           <div slot="footer">
-            <a-badge color="rgb(115, 182, 195)" :text="'发送: '+msgRev+' 条'" />
+            <a-badge color="rgb(115, 182, 195)" :text="'确认: '+msgSent+' 条'" />
             <pre>  </pre>
-            <a-badge color="rgb(255, 227, 135)" :text="'收到: '+msgSent+' 条'" />
+            <a-badge color="rgb(255, 227, 135)" :text="'发送: '+msgRev+' 条'" />
 
           </div>
         </chart-card>
@@ -143,6 +143,7 @@ const columns = [
     title: '客户端id',
     dataIndex: 'clientid',
     key: 'clientid',
+    ellipsis: true,
     scopedSlots: {
       filterDropdown: 'filterDropdown',
       filterIcon: 'filterIcon',
@@ -291,8 +292,12 @@ export default {
     }
   },
   mounted() {
-    this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received'],
-        this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
+    this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received']
+    this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
+    if(this.msgRev===0&&this.msgSent===0){
+      this.msgRev=1
+      this.msgSent=1
+    }
   },
   created() {
     setTimeout(() => this.loading = !this.loading, 1000)
@@ -303,8 +308,12 @@ export default {
     dataInfo: {
       immediate:true,
       handler:function(){
-      this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received'],
+      this.msgRev=this.dataInfo.emqMetricsInfo[0].metrics['messages.received']
       this.msgSent=this.dataInfo.emqMetricsInfo[0].metrics['messages.sent']
+        if(this.msgRev===0&&this.msgSent===0){
+          this.msgRev=1
+          this.msgSent=1
+        }
     }}
 
   },
