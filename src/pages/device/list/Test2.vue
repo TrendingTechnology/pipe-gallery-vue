@@ -1,12 +1,12 @@
-<template >
-  <a-card style="margin-top: 14px">
+<template>
+  <a-card>
     <div :class="advanced ? 'search' : null">
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
           <a-row >
             <a-col :md="8" :sm="24" >
               <a-form-item
-                  label="仓端名"
+                  label="规则编号"
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
@@ -96,16 +96,27 @@
           :columns="columns"
           :dataSource="dataSource"
           :selectedRows.sync="selectedRows"
-          :rowKey="(record,index)=> index"
           @clear="onClear"
           @change="onChange"
           @selectedRowChange="onSelectChange"
       >
-        <div slot="node" slot-scope="text">
+        <div slot="description" slot-scope="{text}">
           {{text}}
         </div>
-        <div slot="switch" slot-scope="text, record">
-            <a-switch checked-children="开" un-checked-children="关" size="small" :checked="text"/>
+        <div slot="action" slot-scope="{text, record}">
+          <a style="margin-right: 8px">
+            <a-icon type="plus"/>新增
+          </a>
+          <a style="margin-right: 8px">
+            <a-icon type="edit"/>编辑
+          </a>
+          <a @click="deleteRecord(record.key)">
+            <a-icon type="delete" />删除1
+          </a>
+          <a @click="deleteRecord(record.key)" v-auth="`delete`">
+            <a-icon type="delete" />删除2
+          </a>
+          <router-link :to="`/list/query/detail/${record.key}`" >详情</router-link>
         </div>
         <template slot="statusTitle">
           <a-icon @click.native="onStatusTitleClick" type="info-circle" />
@@ -114,117 +125,60 @@
     </div>
   </a-card>
 </template>
+
 <script>
 import StandardTable from '@/components/table/StandardTable'
-import {getDCurrentInfo} from "@/services/device";
 const columns = [
   {
-    title: 'id',
-    dataIndex: 'wsId',
-    align:'center',
+    title: '规则编号',
+    dataIndex: 'no'
   },
   {
-    title: '仓端名',
-    dataIndex: 'wsName',
-    align:'center',
+    title: '描述',
+    dataIndex: 'description',
+    scopedSlots: { customRender: 'description' }
   },
   {
-    title: '节点',
-    dataIndex: 'node',
-    align:'center',
-    scopedSlots: { customRender: 'node' }
+    title: '服务调用次数',
+    dataIndex: 'callNo',
+    sorter: true,
+    needTotal: true,
+    customRender: (text) => text + ' 次'
   },
   {
-    title: '温度',
-    dataIndex: 'deviceTemp',
-    sorter: (a, b) => a.deviceTemp - b.deviceTemp,
-    align:'center',
-    slots: {title: 'statusTitle'},
-    customRender: (text) => text +' ℃'
+    dataIndex: 'status',
+    needTotal: true,
+    slots: {title: 'statusTitle'}
   },
   {
-    title: '湿度',
-    dataIndex: 'deviceHumi',
-    sorter: (a, b) => a.deviceHumi - b.deviceHumi,
-    align:'center',
-    slots: {title: 'statusTitle'},
-    customRender: (text) => text +' %RH'
+    title: '更新时间',
+    dataIndex: 'updatedAt',
+    sorter: true
   },
   {
-    title: '液位值',
-    dataIndex: 'deviceLlv',
-    sorter: (a, b) => a.deviceLlv - b.deviceLlv,
-    align:'center',
-    customRender: (text) => text +' 米'
-  },
-  {
-    title: '可燃气体浓度',
-    dataIndex: 'deviceGas',
-    sorter: (a, b) => a.deviceGas - b.deviceGas,
-    align:'center',
-    customRender: (text) => text +' %RH'
-  },
-  {
-    title: '氧气浓度',
-    dataIndex: 'deviceO2',
-    sorter: (a, b) => a.deviceO2 - b.deviceO2,
-    align:'center',
-    customRender: (text) => text +' %'
-  },
-  {
-    title: '烟感',
-    dataIndex: 'deviceSmoke',
-    align:'center',
-    sorter: (a, b) => a.deviceSmoke - b.deviceSmoke,
-    scopedSlots: { customRender: 'switch' }
-  },
-  {
-    title: '照明',
-    dataIndex: 'deviceLighting',
-    align:'center',
-    sorter: (a, b) => a.deviceLighting - b.deviceLighting,
-    scopedSlots: { customRender: 'switch' }
-  },
-  {
-    title: '水泵',
-    dataIndex: 'deviceWaterpump',
-    align:'center',
-    sorter: (a, b) => a.deviceWaterpump - b.deviceWaterpump,
-    scopedSlots: { customRender: 'switch' }
-  },
-  {
-    title: '风机',
-    dataIndex: 'deviceFan',
-    align:'center',
-    sorter: (a, b) => a.deviceFan - b.deviceFan,
-    scopedSlots: { customRender: 'switch' }
-  },
-  {
-    title: '红外',
-    dataIndex: 'deviceInfra',
-    align:'center',
-    sorter: (a, b) => a.deviceInfra - b.deviceInfra,
-    scopedSlots: { customRender: 'switch' }
-  },
-  {
-    title: '门禁',
-    dataIndex: 'deviceGuard',
-    align:'center',
-    sorter: (a, b) => a.deviceGuard - b.deviceGuard,
-    scopedSlots: { customRender: 'switch' }
+    title: '操作',
+    scopedSlots: { customRender: 'action' }
   }
 ]
-
-
-
+const dataSource = []
+for (let i = 0; i < 100; i++) {
+  dataSource.push({
+    key: i,
+    no: 'NO ' + i,
+    description: '这是一段描述',
+    callNo: Math.floor(Math.random() * 1000),
+    status: Math.floor(Math.random() * 10) % 4,
+    updatedAt: '2018-07-26'
+  })
+}
 export default {
-  name: 'Detail',
+  name: 'QueryList',
   components: {StandardTable},
   data () {
     return {
       advanced: true,
       columns: columns,
-      dataSource: [],
+      dataSource: dataSource,
       selectedRows: []
     }
   },
@@ -269,22 +223,12 @@ export default {
       if (e.key === 'delete') {
         this.remove()
       }
-    },
-    loadData (){
-      var vm = this;
-      getDCurrentInfo().then(res => {
-        vm.dataSource=res.data.data;
-
-      })
     }
-  },
-  created () {
-    this.loadData()
   }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .search{
   margin-bottom: 54px;
 }

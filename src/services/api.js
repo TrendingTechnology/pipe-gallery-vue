@@ -32,4 +32,5 @@ module.exports = {
   LOG_INFO:`${request_url}/info/logInfo`,
   SYS_INFO:`${request_url}/info/sysInfo`,
   SUBTOP_INFO:`${request_url}/info/emqSubtopInfo`,
+  DEVICECURRENT_INFO:`${request_url}/device/getDeviceCurrent`,
 }

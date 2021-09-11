@@ -1,4 +1,4 @@
-<template >
+<template>
   <a-card style="margin-top: 14px">
     <div :class="advanced ? 'search' : null">
       <a-form layout="horizontal">
@@ -96,16 +96,12 @@
           :columns="columns"
           :dataSource="dataSource"
           :selectedRows.sync="selectedRows"
-          :rowKey="(record,index)=> index"
           @clear="onClear"
           @change="onChange"
           @selectedRowChange="onSelectChange"
       >
-        <div slot="node" slot-scope="text">
-          {{text}}
-        </div>
         <div slot="switch" slot-scope="text, record">
-            <a-switch checked-children="开" un-checked-children="关" size="small" :checked="text"/>
+          <a-switch checked-children="开" un-checked-children="关" size="small" :checked="text.text===1"/>
         </div>
         <template slot="statusTitle">
           <a-icon @click.native="onStatusTitleClick" type="info-circle" />
@@ -114,6 +110,7 @@
     </div>
   </a-card>
 </template>
+
 <script>
 import StandardTable from '@/components/table/StandardTable'
 import {getDCurrentInfo} from "@/services/device";
@@ -158,14 +155,14 @@ const columns = [
     customRender: (text) => text +' 米'
   },
   {
-    title: '可燃气体浓度',
+    title: '可燃气体',
     dataIndex: 'deviceGas',
     sorter: (a, b) => a.deviceGas - b.deviceGas,
     align:'center',
     customRender: (text) => text +' %RH'
   },
   {
-    title: '氧气浓度',
+    title: '氧气',
     dataIndex: 'deviceO2',
     sorter: (a, b) => a.deviceO2 - b.deviceO2,
     align:'center',
@@ -215,10 +212,8 @@ const columns = [
   }
 ]
 
-
-
 export default {
-  name: 'Detail',
+  name: 'Test',
   components: {StandardTable},
   data () {
     return {
@@ -271,10 +266,12 @@ export default {
       }
     },
     loadData (){
-      var vm = this;
+      let vm = this;
       getDCurrentInfo().then(res => {
-        vm.dataSource=res.data.data;
-
+        let data=res.data.data;
+        data.filter((item,i) =>{item.key = i;})
+        vm.dataSource=data;
+        console.log(data);
       })
     }
   },
@@ -284,7 +281,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .search{
   margin-bottom: 54px;
 }
