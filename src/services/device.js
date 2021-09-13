@@ -1,4 +1,4 @@
-import {DEVICECURRENT_INFO,SUBTOP_INFO} from '@/services/api'
+import {DEVICECURRENT_INFO,STATE_CHANGE} from '@/services/api'
 import {request, METHOD} from '@/utils/request'
 
 
@@ -6,16 +6,16 @@ import {request, METHOD} from '@/utils/request'
 export async function getDCurrentInfo() {
     return request(DEVICECURRENT_INFO,METHOD.GET)
 }
-export async function getSubTop(clientid) {
-    return request(SUBTOP_INFO,METHOD.GET,{
-        clientid: clientid
-    })
+export async function letStateChange(deviceCurrent) {
+    return request(STATE_CHANGE,METHOD.POST,
+        deviceCurrent
+    )
 }
 
 
 
 export default {
     getDCurrentInfo,
-    getSubTop
+    letStateChange
 
 }

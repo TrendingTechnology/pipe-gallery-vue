@@ -1,7 +1,7 @@
 <template>
   <a-card style="margin-top: 14px">
     <div :class="advanced ? 'search' : null">
-      <a-form layout="horizontal">
+      <a-form layout="horizontal" :form="form">
         <div :class="advanced ? null: 'fold'">
           <a-row >
             <a-col :md="8" :sm="24" >
@@ -15,51 +15,60 @@
             </a-col>
             <a-col :md="8" :sm="24" >
               <a-form-item
-                  label="使用状态"
-                  :labelCol="{span: 5}"
-                  :wrapperCol="{span: 18, offset: 1}"
-              >
-                <a-select placeholder="请选择">
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24" >
-              <a-form-item
-                  label="调用次数"
+                  label="节点名"
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
                 <a-input-number style="width: 100%" placeholder="请输入" />
               </a-form-item>
             </a-col>
-          </a-row>
-          <a-row v-if="advanced">
             <a-col :md="8" :sm="24" >
               <a-form-item
-                  label="更新日期"
-                  :labelCol="{span: 5}"
-                  :wrapperCol="{span: 18, offset: 1}"
-              >
-                <a-date-picker style="width: 100%" placeholder="请输入更新日期" />
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24" >
-              <a-form-item
-                  label="使用状态"
+                  label="开关"
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
                 <a-select placeholder="请选择">
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
+                  <a-select-option value="1">全部</a-select-option>
+                  <a-select-option value="2">烟感</a-select-option>
+                  <a-select-option value="3">照明</a-select-option>
+                  <a-select-option value="4">水泵</a-select-option>
+                  <a-select-option value="5">风机</a-select-option>
+                  <a-select-option value="6">红外</a-select-option>
+                  <a-select-option value="7">门禁</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+
+          </a-row>
+          <a-row v-if="advanced">
+            <a-col :md="8" :sm="24" >
+              <a-form-item
+                  label="测量值"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 1}"
+              >
+                <a-select placeholder="请选择">
+                  <a-select-option value="1">温度</a-select-option>
+                  <a-select-option value="2">湿度</a-select-option>
+                  <a-select-option value="3">液位值</a-select-option>
+                  <a-select-option value="4">可燃气体</a-select-option>
+                  <a-select-option value="5">氧气</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24" >
               <a-form-item
-                  label="描述"
+                  label="起始值"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 1}"
+              >
+                <a-input placeholder="请输入" />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24" >
+              <a-form-item
+                  label="终值"
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
@@ -71,49 +80,53 @@
         <span style="float: right; margin-top: 3px;">
           <a-button type="primary">查询</a-button>
           <a-button style="margin-left: 8px">重置</a-button>
+          <a-dropdown style="margin-left: 8px;">
+           <a-menu slot="overlay" @click="handleMenuClick">
+             <a-menu-item key="1">
+               全 开
+             </a-menu-item>
+             <a-menu-item key="2">
+               全 关
+             </a-menu-item>
+           </a-menu>
+          <a-button >操作<a-icon type="down" /></a-button>
+        </a-dropdown>
+
           <a @click="toggleAdvanced" style="margin-left: 8px">
             {{advanced ? '收起' : '展开'}}
             <a-icon :type="advanced ? 'up' : 'down'" />
           </a>
         </span>
       </a-form>
+
     </div>
-    <div>
-      <a-space class="operator">
-        <a-button @click="addNew" type="primary">新建</a-button>
-        <a-button >批量操作</a-button>
-        <a-dropdown>
-          <a-menu @click="handleMenuClick" slot="overlay">
-            <a-menu-item key="delete">删除</a-menu-item>
-            <a-menu-item key="audit">审批</a-menu-item>
-          </a-menu>
-          <a-button>
-            更多操作 <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
-      </a-space>
-      <standard-table
+    <div  class="ant-pro-table-wrapper">
+      <a-table
           :columns="columns"
           :dataSource="dataSource"
-          :selectedRows.sync="selectedRows"
           @clear="onClear"
           @change="onChange"
           @selectedRowChange="onSelectChange"
+          :scroll="{ x: true }"
       >
-        <div slot="switch" slot-scope="text, record">
-          <a-switch checked-children="开" un-checked-children="关" size="small" :checked="text.text===1"/>
+        <div slot="switch" slot-scope="text, record, index, column">
+          {{record.key}}
+<!--          {{index}}-->
+          <a-switch checked-children="开" un-checked-children="关" size="small"
+                    :checked="text===1||text===true" @click="switchClicked(record.key,column.dataIndex)"/>
         </div>
-        <template slot="statusTitle">
-          <a-icon @click.native="onStatusTitleClick" type="info-circle" />
-        </template>
-      </standard-table>
+        <div slot="node" slot-scope="text, record">
+          <router-link to="page">{{text}}</router-link>
+        </div>
+      </a-table>
     </div>
   </a-card>
 </template>
 
 <script>
 import StandardTable from '@/components/table/StandardTable'
-import {getDCurrentInfo} from "@/services/device";
+import {getDCurrentInfo, letStateChange, stateChange} from "@/services/device";
+
 const columns = [
   {
     title: 'id',
@@ -227,6 +240,16 @@ export default {
     deleteRecord: 'delete'
   },
   methods: {
+    switchClicked(index,dataIndex){
+      let temp=this.dataSource[index][dataIndex]
+      if (temp===1){
+        this.dataSource[index][dataIndex]=0
+      }else{
+        this.dataSource[index][dataIndex]=1
+      }
+      letStateChange(this.dataSource[index])
+      console.log(this.dataSource);
+    },
     deleteRecord(key) {
       this.dataSource = this.dataSource.filter(item => item.key !== key)
       this.selectedRows = this.selectedRows.filter(item => item.key !== key)
@@ -261,9 +284,12 @@ export default {
       })
     },
     handleMenuClick (e) {
-      if (e.key === 'delete') {
-        this.remove()
+      if (e.key==='1'){
+
+      }else{
+
       }
+
     },
     loadData (){
       let vm = this;
@@ -271,12 +297,23 @@ export default {
         let data=res.data.data;
         data.filter((item,i) =>{item.key = i;})
         vm.dataSource=data;
-        console.log(data);
       })
-    }
+    },
   },
   created () {
     this.loadData()
+  },
+  // mounted() {
+  //   if (this.timer) {
+  //     clearInterval(this.timer);
+  //   } else {
+  //     this.timer = setInterval(() => {
+  //       this.loadData(); // methods中请求数据的方法
+  //     }, 3000);
+  //   }
+  // },
+  destroyed() {
+    clearInterval(this.timer);
   }
 }
 </script>
@@ -297,4 +334,7 @@ export default {
     width: 100%;
   }
 }
+.table {
+  overflow: auto;}
+
 </style>
