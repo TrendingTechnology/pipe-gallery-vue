@@ -110,7 +110,7 @@
           :scroll="{ x: true }"
       >
         <div slot="switch" slot-scope="text, record, index, column">
-          {{record.key}}
+<!--          {{record.key}}-->
 <!--          {{index}}-->
           <a-switch checked-children="开" un-checked-children="关" size="small"
                     :checked="text===1||text===true" @click="switchClicked(record.key,column.dataIndex)"/>
