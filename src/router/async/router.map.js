@@ -70,6 +70,10 @@ const routerMap = {
     name: '设备列表',
     component: () => import('@/pages/device/list')
   },
+  设备详情:{
+    name: '设备详情',
+    component: () => import('@/pages/device/detail')
+  },
   success: {
     name: '成功',
     component: () => import('@/pages/result/Success')

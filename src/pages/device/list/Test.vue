@@ -1,7 +1,7 @@
 <template>
   <a-card style="margin-top: 14px">
     <div :class="advanced ? 'search' : null">
-      <a-form layout="horizontal" :form="form">
+      <a-form layout="horizontal" :form="form" @submit="handleSubmit">
         <div :class="advanced ? null: 'fold'">
           <a-row >
             <a-col :md="8" :sm="24" >
@@ -10,7 +10,8 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-input placeholder="请输入" />
+                <a-input placeholder="请输入"
+                         v-decorator="['condition.wsName']"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24" >
@@ -19,27 +20,27 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-input-number style="width: 100%" placeholder="请输入" />
+                <a-input style="width: 100%" placeholder="请输入"
+                                v-decorator="['condition.node']"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24" >
               <a-form-item
-                  label="开关"
+                  label="开关(开)"
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-select placeholder="请选择">
-                  <a-select-option value="1">全部</a-select-option>
-                  <a-select-option value="2">烟感</a-select-option>
-                  <a-select-option value="3">照明</a-select-option>
-                  <a-select-option value="4">水泵</a-select-option>
-                  <a-select-option value="5">风机</a-select-option>
-                  <a-select-option value="6">红外</a-select-option>
-                  <a-select-option value="7">门禁</a-select-option>
+                <a-select placeholder="请选择" v-decorator="['condition.sw']">
+                  <a-select-option value="all">全部</a-select-option>
+                  <a-select-option value="smoke">烟感</a-select-option>
+                  <a-select-option value="light">照明</a-select-option>
+                  <a-select-option value="waterpump">水泵</a-select-option>
+                  <a-select-option value="fan">风机</a-select-option>
+                  <a-select-option value="infra">红外</a-select-option>
+                  <a-select-option value="guard">门禁</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-
           </a-row>
           <a-row v-if="advanced">
             <a-col :md="8" :sm="24" >
@@ -48,12 +49,12 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-select placeholder="请选择">
-                  <a-select-option value="1">温度</a-select-option>
-                  <a-select-option value="2">湿度</a-select-option>
-                  <a-select-option value="3">液位值</a-select-option>
-                  <a-select-option value="4">可燃气体</a-select-option>
-                  <a-select-option value="5">氧气</a-select-option>
+                <a-select placeholder="请选择" v-decorator="['condition.measure']">
+                  <a-select-option value="temp">温度</a-select-option>
+                  <a-select-option value="humi">湿度</a-select-option>
+                  <a-select-option value="llv">液位值</a-select-option>
+                  <a-select-option value="gas">可燃气体</a-select-option>
+                  <a-select-option value="O2">氧气</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -63,7 +64,7 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-input placeholder="请输入" />
+                <a-input-number style="width: 100%" placeholder="请输入" v-decorator="['condition.start']"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24" >
@@ -72,30 +73,26 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-input placeholder="请输入" />
+                <a-input-number style="width: 100%" placeholder="请输入" v-decorator="['condition.end']" />
               </a-form-item>
             </a-col>
           </a-row>
         </div>
         <span style="float: right; margin-top: 3px;">
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
+          <a-button type="primary" htmlType="submit">查询</a-button>
+          <a-button style="margin-left: 8px" @click="handleReset">重置</a-button>
           <a-dropdown style="margin-left: 8px;">
            <a-menu slot="overlay" @click="handleMenuClick">
+             <a-menu-item key="0">
+               全 关
+             </a-menu-item>
              <a-menu-item key="1">
                全 开
-             </a-menu-item>
-             <a-menu-item key="2">
-               全 关
              </a-menu-item>
            </a-menu>
           <a-button >操作<a-icon type="down" /></a-button>
         </a-dropdown>
 
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{advanced ? '收起' : '展开'}}
-            <a-icon :type="advanced ? 'up' : 'down'" />
-          </a>
         </span>
       </a-form>
 
@@ -116,7 +113,7 @@
                     :checked="text===1||text===true" @click="switchClicked(record.key,column.dataIndex)"/>
         </div>
         <div slot="node" slot-scope="text, record">
-          <router-link to="page">{{text}}</router-link>
+          <router-link tag="a" :to="{path:'/device/detail',query:{wsName:record.wsName,node:text}}" >{{text}}</router-link>
         </div>
       </a-table>
     </div>
@@ -233,13 +230,42 @@ export default {
       advanced: true,
       columns: columns,
       dataSource: [],
-      selectedRows: []
+      selectedRows: [],
+      queryDevice: {},
+      form: this.$form.createForm(this),
     }
   },
   authorize: {
     deleteRecord: 'delete'
   },
   methods: {
+    handleReset() {
+      this.form.resetFields();
+      this.queryDevice={}
+      this.loadData()
+    },
+    handleSubmit(e){
+      // // let wsName= this.form.getFieldValue('condition.wsName');
+      // // let node= this.form.getFieldValue('condition.node');
+      // // let sw= this.form.getFieldValue('condition.sw');
+      // // let measure= this.form.getFieldValue('condition.measure');
+      // // let start= this.form.getFieldValue('condition.start');
+      // // let end= this.form.getFieldValue('condition.end');
+      let condition=this.form.getFieldValue('condition');
+      if (condition===null){
+        condition={}
+      }
+      console.log(condition);
+      // // console.log(condition);
+      this.queryDevice=condition;
+      this.loadData()
+      // console.log(wsName);
+      // console.log(node);
+      // console.log(sw);
+      // console.log(measure);
+      // console.log(start);
+      // console.log(end);
+    },
     switchClicked(index,dataIndex){
       let temp=this.dataSource[index][dataIndex]
       if (temp===1){
@@ -256,6 +282,7 @@ export default {
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
+      console.log(this.advanced);
     },
     remove () {
       this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
@@ -284,16 +311,22 @@ export default {
       })
     },
     handleMenuClick (e) {
-      if (e.key==='1'){
 
-      }else{
-
-      }
+      this.dataSource.forEach((value) => {
+        let sw = Number(e.key);
+        value.deviceSmoke=sw
+        value.deviceLighting=sw
+        value.deviceWaterpump=sw
+        value.deviceFan=sw
+        value.deviceInfra=sw
+        value.deviceGuard=sw
+        letStateChange(value)
+      })
 
     },
     loadData (){
       let vm = this;
-      getDCurrentInfo().then(res => {
+      getDCurrentInfo(this.queryDevice).then(res => {
         let data=res.data.data;
         data.filter((item,i) =>{item.key = i;})
         vm.dataSource=data;
@@ -312,9 +345,9 @@ export default {
   //     }, 3000);
   //   }
   // },
-  destroyed() {
-    clearInterval(this.timer);
-  }
+  // destroyed() {
+  //   clearInterval(this.timer);
+  // }
 }
 </script>
 
