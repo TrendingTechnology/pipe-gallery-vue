@@ -107,13 +107,19 @@
           :scroll="{ x: true }"
       >
         <div slot="switch" slot-scope="text, record, index, column">
-<!--          {{record.key}}-->
-<!--          {{index}}-->
           <a-switch checked-children="开" un-checked-children="关" size="small"
                     :checked="text===1||text===true" @click="switchClicked(record.key,column.dataIndex)"/>
         </div>
         <div slot="node" slot-scope="text, record">
           <router-link tag="a" :to="{path:'/device/detail',query:{wsName:record.wsName,node:text}}" >{{text}}</router-link>
+        </div>
+        <div slot="status" slot-scope="text, record, index, column">
+          <span v-if="text===1">
+            <span style="color:green">在线</span>
+          </span>
+          <span v-else>
+            <span style="color:red">离线</span>
+          </span>
         </div>
       </a-table>
     </div>
@@ -140,6 +146,11 @@ const columns = [
     dataIndex: 'node',
     align:'center',
     scopedSlots: { customRender: 'node' }
+  },  {
+    title: '状态',
+    dataIndex: 'status',
+    align:'center',
+    scopedSlots: { customRender: 'status' }
   },
   {
     title: '温度',
@@ -322,6 +333,10 @@ export default {
         value.deviceGuard=sw
         letStateChange(value)
       })
+      clearInterval(this.timer);
+      this.timer = setInterval(() => {
+        this.loadData();
+      }, 1000);
 
     },
     loadData (){
@@ -336,18 +351,18 @@ export default {
   created () {
     this.loadData()
   },
-  // mounted() {
-  //   if (this.timer) {
-  //     clearInterval(this.timer);
-  //   } else {
-  //     this.timer = setInterval(() => {
-  //       this.loadData(); // methods中请求数据的方法
-  //     }, 3000);
-  //   }
-  // },
-  // destroyed() {
-  //   clearInterval(this.timer);
-  // }
+  mounted() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    } else {
+      this.timer = setInterval(() => {
+        this.loadData(); // methods中请求数据的方法
+      }, 1000);
+    }
+  },
+  destroyed() {
+    clearInterval(this.timer);
+  }
 }
 </script>
 
