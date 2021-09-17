@@ -81,17 +81,17 @@
         <span style="float: right; margin-top: 3px;">
           <a-button type="primary" htmlType="submit">查询</a-button>
           <a-button style="margin-left: 8px" @click="handleReset">重置</a-button>
-          <a-dropdown style="margin-left: 8px;">
-           <a-menu slot="overlay" @click="handleMenuClick">
-             <a-menu-item key="0">
-               全 关
-             </a-menu-item>
-             <a-menu-item key="1">
-               全 开
-             </a-menu-item>
-           </a-menu>
-          <a-button >操作<a-icon type="down" /></a-button>
-        </a-dropdown>
+<!--          <a-dropdown style="margin-left: 8px;">-->
+<!--           <a-menu slot="overlay" @click="handleMenuClick">-->
+<!--             <a-menu-item key="0">-->
+<!--               全 关-->
+<!--             </a-menu-item>-->
+<!--             <a-menu-item key="1">-->
+<!--               全 开-->
+<!--             </a-menu-item>-->
+<!--           </a-menu>-->
+<!--          <a-button >操作<a-icon type="down" /></a-button>-->
+<!--        </a-dropdown>-->
 
         </span>
       </a-form>
@@ -279,10 +279,13 @@ export default {
     },
     switchClicked(index,dataIndex){
       let temp=this.dataSource[index][dataIndex]
+      this.dataSource[index].changeSw=dataIndex;
       if (temp===1){
         this.dataSource[index][dataIndex]=0
+        this.dataSource[index].changeValue=0
       }else{
         this.dataSource[index][dataIndex]=1
+        this.dataSource[index].changeValue=1
       }
       letStateChange(this.dataSource[index])
       console.log(this.dataSource);
