@@ -2,7 +2,6 @@
   <div>
     <a-modal
         :visible="true"
-
         @cancel="handleCancel"
         width="800px"
     >

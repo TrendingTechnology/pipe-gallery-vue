@@ -2,7 +2,7 @@
 //const API_PROXY_PREFIX='/api'
 //const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_BASE_URL : API_PROXY_PREFIX
 //const BASE_URL = process.env.VUE_APP_API_BASE_URL
-const request_url = 'http://192.168.2.219:9998'
+const request_url = 'http://127.0.0.1:9998'
 module.exports = {
   LOGIN: `${request_url}/auth/login`,
   USER_INFO: `${request_url}/auth/user/info`,
@@ -35,4 +35,5 @@ module.exports = {
   DEVICECURRENT_INFO:`${request_url}/device/getDeviceCurrent`,
   STATE_CHANGE:`${request_url}/device/stateSwitch`,
   DEVICELOG_INFO:`${request_url}/device/getDeviceLog`,
+  QUERY_CMD:`${request_url}/device/queryDevice`,
 }
