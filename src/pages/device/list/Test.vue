@@ -288,6 +288,12 @@ export default {
         this.dataSource[index].changeValue=1
       }
       letStateChange(this.dataSource[index])
+      .then(res=>{
+        if(res.data.code===500){
+          console.log(res.data);
+          this.$message.error(res.data.data)
+        }
+      })
       console.log(this.dataSource);
     },
     deleteRecord(key) {
