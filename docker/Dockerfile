@@ -1,3 +1,3 @@
-FROM daocloud.io/library/nginx:1.12.0-alpine
+FROM nginx
 EXPOSE 80
 COPY /dist /usr/share/nginx/html
